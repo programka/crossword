@@ -137,7 +137,7 @@ class CrosswordCreator():
         if arcs == None:
             for x, _ in self.domains:
                 for y, _ in self.domains:
-                    arcs.append({x, y}) # key != key2 ?
+                    arcs.append({x, y}) # key != key2 ? use neighbors func
 
         while arcs.size != 0:
             for x, y in arcs:
@@ -166,7 +166,15 @@ class CrosswordCreator():
         Return True if `assignment` is consistent (i.e., words fit in crossword
         puzzle without conflicting characters); return False otherwise.
         """
-        raise NotImplementedError
+        s = {}
+        for key, value in assignment.items():
+            if value.length != key.length:
+                return False
+            s.add(value)
+        if s.size != assignment.size:
+            return False
+        # TODO: check there are no conflicts between neighboring variables
+        return True
 
     def order_domain_values(self, var, assignment):
         """
