@@ -159,7 +159,9 @@ class CrosswordCreator():
         for key, value in assignment.items():
             if value != None:
                 return False
-        return True
+        if assignment.keys() == self.crossword.variables:
+            return True
+        return False
 
     def consistent(self, assignment):
         """
@@ -208,7 +210,6 @@ class CrosswordCreator():
 
         If no assignment is possible, return None.
         """
-        raise NotImplementedError
 
 
 def main():
