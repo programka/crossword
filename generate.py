@@ -210,7 +210,21 @@ class CrosswordCreator():
 
         If no assignment is possible, return None.
         """
+        var = self.select_unassigned_variable(assignment)
 
+        if self.assignment_complete(assignment):
+            return assignment
+        
+        for word in self.crossword.words:
+            assignment[var] = word
+            self.enforce_node_consistency()
+            if self.ac3() != False:
+                result = self.backtrack(assignment)
+                if result != None:
+                    return result
+            
+        return None
+        
 
 def main():
 
