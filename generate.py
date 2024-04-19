@@ -99,10 +99,13 @@ class CrosswordCreator():
         (Remove any values that are inconsistent with a variable's unary
          constraints; in this case, the length of the word.)
         """
+        to_delete = set()
         for key, values in self.domains.items():
             for value in values:
-                if key.length != value.length:
-                    self.domains[key].remove(value)
+                if key.length != len(value):
+                    to_delete.add(value)
+            for value in to_delete:
+                self.domains[key].remove(value)
 
     def revise(self, x, y):
         """
@@ -113,10 +116,13 @@ class CrosswordCreator():
         Return True if a revision was made to the domain of `x`; return
         False if no revision was made.
         """
+        # TODO: completely rewrite
         revision = False
         for value_x in self.domains[x]:
             for value_y in self.domains[y]:
-                overlap = self.crossword.overlaps(value_x, value_y)
+                if x == y:
+                    continue
+                overlap = self.crossword.overlaps[x, y]
                 if overlap == None:
                     break
                 if value_x[overlap.v1] == value_y[overlap.v2]: #?
@@ -135,17 +141,18 @@ class CrosswordCreator():
         return False if one or more domains end up empty.
         """
         if arcs == None:
-            for x, _ in self.domains:
-                for y, _ in self.domains:
-                    arcs.append({x, y}) # key != key2 ? use neighbors func
+            arcs = []
+            for x in self.domains.keys():
+                for y in self.domains.keys():
+                    arcs.append((x, y)) # key != key2 ? use neighbors func
 
-        while arcs.size != 0:
-            for x, y in arcs:
-                if self.revise(x, y) == True:
-                    for key, _ in self.domains:
-                        arcs.append(x, key)
+        while len(arcs) != 0:
+            for arc in arcs:
+                if self.revise(arc[0], arc[1]) == True:
+                    for key in self.domains.keys():
+                        arcs.append((arc[0], key))
         
-        for _, value in self.domains:
+        for  value in self.domains.values():
             if value.empty:
                 return False
             
@@ -168,7 +175,7 @@ class CrosswordCreator():
         Return True if `assignment` is consistent (i.e., words fit in crossword
         puzzle without conflicting characters); return False otherwise.
         """
-        s = {}
+        s = set()
         for key, value in assignment.items():
             if value.length != key.length:
                 return False
