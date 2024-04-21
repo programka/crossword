@@ -159,9 +159,12 @@ class CrosswordCreator():
                 if self.revise(arc[0], arc[1]) == True:
                     for key in self.domains.keys():
                         arcs.append((arc[0], key))
+                else:
+                    arcs.remove(arc)
+                    
         
-        for  value in self.domains.values():
-            if value.empty:
+        for value in self.domains.values():
+            if len(value) == 0:
                 return False
             
         return True
